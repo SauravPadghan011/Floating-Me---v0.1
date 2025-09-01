@@ -1,6 +1,5 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { createFPSController } from './wasd-controller';
+import { createFPSController } from './fps-controls.js';
 
 const w = window.innerWidth;
 const h = window.innerHeight;
@@ -16,23 +15,24 @@ const camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 100);
 camera.position.set(0, 2, 10);
 
 scene.add(new THREE.AxesHelper(5));
-scene.add(new THREE.HemisphereLight(0xffffff, 0x444444));
+scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 1));
 
 // const orbit = new OrbitControls(camera, renderer.domElement);
 // orbit.update();
 
 // create a cube and geometry
-const boxGeometry = new THREE.BoxGeometry();
-const boxMaterial = new THREE.MeshStandardMaterial({ color: 0x00FF00 })
+const boxGeometry = new THREE.BoxGeometry(2, 2, 2);
+const boxMaterial = new THREE.MeshStandardMaterial({ color: 0x55ff99 });
 const cube = new THREE.Mesh(boxGeometry, boxMaterial);
 // cube.scale.setScalar(2);
+cube.position.y = 1;
 scene.add(cube);
 
 // add a plane in scene
 const groundGeometry = new THREE.PlaneGeometry(30, 30);
-const groundMaterial = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+const groundMaterial = new THREE.MeshBasicMaterial({ color: 0x808080 });
 const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-ground.rotation.x = -0.5 * Math.PI;
+ground.rotation.x = -Math.PI/2;
 scene.add(ground);
 
 // add grid
@@ -43,7 +43,7 @@ const clock = new THREE.Clock();
 const fps = createFPSController(camera, renderer.domElement, {
     speed: 6,
     boost: 2,
-    fly: true
+    minY: null
 });
 
 // click to lock mouse & capture keys
@@ -59,17 +59,12 @@ window.addEventListener('resize', () => {
 function animate() {
     requestAnimationFrame(animate);
     const dt = clock.getDelta();
-
-    // cube.rotation.x += 0.0015;
-    // cube.rotation.y += 0.0015;
-
     fps.update(dt);
-    // orbit.update();
+    renderer.render(scene, camera);
 
     const obj = fps.controls.getObject();
     if (obj.position.y < EYE_HEIGHT) obj.position.y = EYE_HEIGHT;
 
-    renderer.render(scene, camera);
 }
 
 animate();
